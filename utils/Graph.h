@@ -48,6 +48,7 @@ public:
     Edge<T> * addEdge(Vertex<T> *dest, double w);
     bool removeEdge(T in);
     void removeOutgoingEdges();
+    friend class MutablePriorityQueue<Vertex>;
 
 protected:
     std::string location = ""; //location
