@@ -10,11 +10,12 @@
 #include <limits>
 #include <algorithm>
 #include <string>
+#include "MutablePriorityQueue.h"
 
 template <class T>
 class Edge;
 
-#define INF std::numeric_limits<double>::max()
+#define INF std::numeric_limits<double>::max()const T &in
 
 /************************* Vertex  **************************/
 
@@ -25,6 +26,9 @@ public:
     bool operator<(Vertex<T> & vertex) const;
 
     T getId() const;
+    std::string getLocation() const;
+    std::string getCode() const;
+    bool getParking() const;
     std::vector<Edge<T> *> getAdj() const;
     bool isVisited() const;
     bool isProcessing() const;
@@ -45,10 +49,11 @@ public:
     void setIndegree(unsigned int indegree);
     void setDist(double dist);
     void setPath(Edge<T> *path);
-    Edge<T> * addEdge(Vertex<T> *dest, double w);
+    Edge<T> * addEdge(Vertex<T> *dest, int driving, int walking);
     bool removeEdge(T in);
     void removeOutgoingEdges();
 
+    friend class MutablePriorityQueue<Vertex>;
 protected:
     std::string location = ""; //location
     T id;                // id of the node
@@ -113,12 +118,12 @@ public:
     /*
     * Auxiliary function to find a vertex with a given the content.
     */
-    Vertex<T> *findVertex(const T &in) const;
+    Vertex<T> *findVertex(std::string code) const;
     /*
      *  Adds a vertex with a given content or id (in) to a graph (this).
      *  Returns true if successful, and false if a vertex with that content already exists.
      */
-    bool addVertex(const T &in);
+    bool addVertex(std::string location, const T &id, std::string code, bool parking);
     bool removeVertex(const T &in);
 
     /*
@@ -126,13 +131,17 @@ public:
      * destination vertices and the edge weight (w).
      * Returns true if successful, and false if the source or destination vertex does not exist.
      */
-    bool addEdge(const T &sourc, const T &dest, double w);
+    bool addEdge(std::string &sourc, std::string &dest, int driving, int walking);
     bool removeEdge(const T &source, const T &dest);
     bool addBidirectionalEdge(const T &sourc, const T &dest, double w);
 
     int getNumVertex() const;
 
     std::vector<Vertex<T> *> getVertexSet() const;
+
+    void printVertices() const;
+    void printEdges() const;
+
 
 
 protected:
@@ -165,8 +174,8 @@ Vertex<T>::Vertex(std::string location, T id, std::string code, bool parking): l
  * with a given destination vertex (d) and edge weight (w).
  */
 template <class T>
-Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
-    auto newEdge = new Edge<T>(this, d, w);
+Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, int driving, int walking) {
+    auto newEdge = new Edge<T>(this, d, driving, walking);
     adj.push_back(newEdge);
     d->incoming.push_back(newEdge);
     return newEdge;
@@ -217,6 +226,21 @@ bool Vertex<T>::operator<(Vertex<T> & vertex) const {
 template <class T>
 T Vertex<T>::getId() const {
     return this->id;
+}
+
+template <class T>
+std::string Vertex<T>::getLocation() const {
+    return this->location;
+}
+
+template <class T>
+std::string Vertex<T>::getCode() const {
+    return this->code;
+}
+
+template <class T>
+bool Vertex<T>::getParking() const {
+    return this->parking;
 }
 
 template <class T>
@@ -391,9 +415,9 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
  * Auxiliary function to find a vertex with a given content.
  */
 template <class T>
-Vertex<T> * Graph<T>::findVertex(const T &in) const {
+Vertex<T> * Graph<T>::findVertex(std::string code) const {
     for (auto v : vertexSet)
-        if (v->getId() == in)
+        if (v->getCode() == code)
             return v;
     return nullptr;
 }
@@ -413,10 +437,10 @@ int Graph<T>::findVertexIdx(const T &in) const {
  *  Returns true if successful, and false if a vertex with that content already exists.
  */
 template <class T>
-bool Graph<T>::addVertex(const T &in) {
-    if (findVertex(in) != nullptr)
+bool Graph<T>::addVertex(std::string location, const T &id, std::string code, bool parking) {
+    if (findVertex(code) != nullptr)
         return false;
-    vertexSet.push_back(new Vertex<T>(in));
+    vertexSet.push_back(new Vertex<T>(location, id, code, parking));
     return true;
 }
 
@@ -448,12 +472,12 @@ bool Graph<T>::removeVertex(const T &in) {
  * Returns true if successful, and false if the source or destination vertex does not exist.
  */
 template <class T>
-bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
+bool Graph<T>::addEdge(std::string &sourc, std::string &dest, int driving, int walking) {
     auto v1 = findVertex(sourc);
     auto v2 = findVertex(dest);
     if (v1 == nullptr || v2 == nullptr)
         return false;
-    v1->addEdge(v2, w);
+    v1->addEdge(v2, driving, walking);
     return true;
 }
 
@@ -482,6 +506,36 @@ bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, double w) {
     e1->setReverse(e2);
     e2->setReverse(e1);
     return true;
+}
+
+template <class T>
+void Graph<T>::printVertices() const {
+    for (auto v : vertexSet) {
+        std::cout << "ID: " << v->getId() 
+                << " | "
+                << "Location: " << v->getLocation() 
+                << " | "
+                << "Code: " << v->getCode() 
+                << " | "
+                << "Parking: " << (v->getParking() ? "Yes" : "No") 
+                << "\n";
+    }
+}
+
+template <class T>
+void Graph<T>::printEdges() const {
+    for (auto vertex : vertexSet) {
+        for (auto edge : vertex->getAdj()) {
+            std::cout << "Origin: " << edge->getOrig()->getCode()
+                    << " | "
+                    << " Destination: " << edge->getDest()->getCode()
+                    << " | "
+                    << " Driving Time: " << edge->getDrivingTime()
+                    << " | "
+                    << "Walking Time: " << edge->getWalkingTime() 
+                    << "\n";
+        }
+    }
 }
 
 inline void deleteMatrix(int **m, int n) {
