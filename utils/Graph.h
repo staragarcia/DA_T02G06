@@ -10,6 +10,7 @@
 #include <limits>
 #include <algorithm>
 #include <string>
+#include "MutablePriorityQueue.h"
 
 template <class T>
 class Edge;
@@ -52,6 +53,7 @@ public:
     bool removeEdge(T in);
     void removeOutgoingEdges();
 
+    friend class MutablePriorityQueue<Vertex>;
 protected:
     std::string location = ""; //location
     T id;                // id of the node
