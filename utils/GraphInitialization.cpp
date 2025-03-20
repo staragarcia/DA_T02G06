@@ -5,7 +5,7 @@
 #include "Graph.h"
 
 void readParseLocations(Graph<int> &g) {
-    std::ifstream file("../datasets/Locations.csv");
+    std::ifstream file("datasets/ExampleLocations.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }
@@ -31,7 +31,7 @@ void readParseLocations(Graph<int> &g) {
 }
 
 void readParseDistances(Graph<int> &g) {
-    std::ifstream file("../datasets/Distances.csv");
+    std::ifstream file("datasets/ExampleDistances.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }
@@ -54,14 +54,4 @@ void readParseDistances(Graph<int> &g) {
         
         g.addEdge(location1, location2, driving, walking);
     }
-}
-
-
-int main () {
-    Graph<int> g;
-    readParseLocations(g);
-    readParseDistances(g);
-    g.printVertices();
-    g.printEdges();
-    return 0;
 }

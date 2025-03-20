@@ -35,6 +35,7 @@ public:
     unsigned int getIndegree() const;
     double getDist() const;
     Edge<T> *getPath() const;
+    Edge<T> *getWalkingPath() const;
     std::vector<Edge<T> *> getIncoming() const;
 
     void setId(T id);
@@ -49,6 +50,7 @@ public:
     void setIndegree(unsigned int indegree);
     void setDist(double dist);
     void setPath(Edge<T> *path);
+    void setWalkingPath(Edge<T> *path);
     Edge<T> * addEdge(Vertex<T> *dest, int driving, int walking);
     bool removeEdge(T in);
     void removeOutgoingEdges();
@@ -66,8 +68,9 @@ protected:
     bool processing = false; // used by isDAG (in addition to the visited attribute)
     int low = -1, num = -1; // used by SCC Tarjan
     unsigned int indegree; // used by topsort
-    double dist = 0; 
+    double dist = std::numeric_limits<double>::max();
     Edge<T> *path = nullptr;
+    Edge<T> *walkingPath = nullptr;
 
     std::vector<Edge<T> *> incoming; // incoming edges
 
@@ -119,6 +122,10 @@ public:
     * Auxiliary function to find a vertex with a given the content.
     */
     Vertex<T> *findVertex(std::string code) const;
+    /**
+     * @brief Find a vertex by its id
+     */
+    Vertex<T> *findVertexById(T id) const;
     /*
      *  Adds a vertex with a given content or id (in) to a graph (this).
      *  Returns true if successful, and false if a vertex with that content already exists.
@@ -294,6 +301,11 @@ Edge<T> *Vertex<T>::getPath() const {
 }
 
 template <class T>
+Edge<T> *Vertex<T>::getWalkingPath() const {
+    return this->walkingPath;
+}
+
+template <class T>
 std::vector<Edge<T> *> Vertex<T>::getIncoming() const {
     return this->incoming;
 }
@@ -325,6 +337,11 @@ void Vertex<T>::setDist(double dist) {
 
 template <class T>
 void Vertex<T>::setPath(Edge<T> *path) {
+    this->path = path;
+}
+
+template <class T>
+void Vertex<T>::setWalkingPath(Edge<T> *path) {
     this->path = path;
 }
 
@@ -412,12 +429,23 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 }
 
 /*
- * Auxiliary function to find a vertex with a given content.
+ * Auxiliary function to find a vertex with a given code.
  */
 template <class T>
 Vertex<T> * Graph<T>::findVertex(std::string code) const {
     for (auto v : vertexSet)
         if (v->getCode() == code)
+            return v;
+    return nullptr;
+}
+
+/*
+ * Auxiliary function to find a vertex with a given id.
+ */
+template <class T>
+Vertex<T> * Graph<T>::findVertexById(T id) const {
+    for (auto v : vertexSet)
+        if (v->getId() == id)
             return v;
     return nullptr;
 }
@@ -560,6 +588,14 @@ template <class T>
 Graph<T>::~Graph() {
     deleteMatrix(distMatrix, vertexSet.size());
     deleteMatrix(pathMatrix, vertexSet.size());
+}
+
+template <class T>
+void cleanUp(const std::vector<Vertex<T>*>& visitedVertices) {
+    for (Vertex<T>* v : visitedVertices) {
+        v->setVisited(false);
+        v->setDist(std::numeric_limits<double>::max());
+    }
 }
 
 #endif /* DA_TP_CLASSES_GRAPH */
