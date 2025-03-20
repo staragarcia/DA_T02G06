@@ -54,6 +54,7 @@ public:
     Edge<T> * addEdge(Vertex<T> *dest, int driving, int walking);
     bool removeEdge(T in);
     void removeOutgoingEdges();
+    friend class MutablePriorityQueue<Vertex>;
 
     friend class MutablePriorityQueue<Vertex>;
 protected:

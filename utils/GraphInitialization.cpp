@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include "Graph.h"
+#include <limits>
 
 void readParseLocations(Graph<int> &g) {
     std::ifstream file("datasets/ExampleLocations.csv");
@@ -43,14 +44,21 @@ void readParseDistances(Graph<int> &g) {
         std::stringstream ss(line);
         std::string location1;
         std::string location2;
-        int driving;
+        std::string driving_str;
         int walking;
         
         std::getline(ss, location1, ',');
         std::getline(ss, location2, ',');
-        ss >> driving;
+        std::getline(ss, driving_str, ',');
         ss.ignore();
         ss >> walking;
+
+        int driving;
+        if (driving_str == "X") {
+            driving = std::numeric_limits<int>::max();  
+        } else {
+            std::stringstream(driving_str) >> driving; 
+        }
         
         g.addEdge(location1, location2, driving, walking);
     }
