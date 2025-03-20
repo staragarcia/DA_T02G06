@@ -15,13 +15,11 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
     pq.insert(source);
     while (!pq.empty()) {
         Vertex<T>* v = pq.extractMin();
-        std::cout << "Popped: " << v->getId() << " with dist " << v->getDist() << std::endl;
         if (v->getDist() > maxWalkTime) {
             cleanUp(visitedVertices);
             return;
         }
         if (v->getParking() && v != source) {
-            std::cout << "Inserting " << v->getId() << " with dist " << v->getDist() << std::endl;
             reacheableVertices.insert({v, v->getDist()});
         }
         for (Edge<T>* e : v->getIncoming()) {
@@ -30,7 +28,6 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
                 continue;
             }
             if (u->getDist() > v->getDist() + e->getWalkingTime()) {
-                std::cout << "Relax: " << u->getId() << " with dist " << v->getDist() << " + " << e->getWalkingTime() << std::endl;
                 u->setDist(v->getDist() + e->getWalkingTime());
                 u->setWalkingPath(e);
                 if (!u->isVisited()) {
@@ -114,9 +111,6 @@ template <class T>
 void calculatePath(const Graph<T>& g, const T sourceId, T destId, const double maxWalkTime, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
     std::unordered_map<Vertex<T>*, double> reacheableWalkingVertices = {};
     walkingReverseDijsktra(g, g.findVertexById(destId), maxWalkTime, reacheableWalkingVertices, avoid_nodes, avoid_edges);
-    for (auto it : reacheableWalkingVertices) {
-        std::cout << "Reacheable walking vertex: " << it.first->getId() << " with cost: " << it.second << std::endl;
-    }
     Vertex<T>* parkingNode = drivingDijkstra(g, g.findVertexById(sourceId), reacheableWalkingVertices, avoid_nodes, avoid_edges);
     if (parkingNode == nullptr) {
         std::cout << "No path found" << std::endl;
@@ -136,8 +130,8 @@ int main () {
     Graph<int> g;
     readParseLocations(g);
     readParseDistances(g);
-    std::unordered_set<int> avoid_nodes = {};
-    std::unordered_set<std::pair<int, int>, pairHash> avoid_edges = {{}};
-    calculatePath(g, 1, 15, 5, avoid_nodes, avoid_edges);
+    std::unordered_set<int> avoid_nodes = {13};
+    std::unordered_set<std::pair<int, int>, pairHash> avoid_edges = {{2,7}};
+    calculatePath(g, 1, 15, 40, avoid_nodes, avoid_edges);
     return 0;
 }
