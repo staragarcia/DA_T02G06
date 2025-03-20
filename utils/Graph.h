@@ -33,7 +33,7 @@ public:
     bool isVisited() const;
     bool isProcessing() const;
     unsigned int getIndegree() const;
-    double getDist() const;
+    int getDist() const;
     Edge<T> *getPath() const;
     Edge<T> *getWalkingPath() const;
     std::vector<Edge<T> *> getIncoming() const;
@@ -48,7 +48,7 @@ public:
     void setNum(int value);
 
     void setIndegree(unsigned int indegree);
-    void setDist(double dist);
+    void setDist(int dist);
     void setPath(Edge<T> *path);
     void setWalkingPath(Edge<T> *path);
     Edge<T> * addEdge(Vertex<T> *dest, int driving, int walking);
@@ -69,7 +69,7 @@ protected:
     bool processing = false; // used by isDAG (in addition to the visited attribute)
     int low = -1, num = -1; // used by SCC Tarjan
     unsigned int indegree; // used by topsort
-    double dist = std::numeric_limits<double>::max();
+    int dist = std::numeric_limits<int>::max();
     Edge<T> *path = nullptr;
     Edge<T> *walkingPath = nullptr;
 
@@ -101,8 +101,8 @@ public:
 protected:
     Vertex<T> *orig;
     Vertex<T> * dest; // destination vertex
-    double drivingTime; // similar to an edge weight, but represents driving times between nodes
-    double walkingTime; // similar to an edge weight, but represents walking times between nodes
+    int drivingTime; // similar to an edge weight, but represents driving times between nodes
+    int walkingTime; // similar to an edge weight, but represents walking times between nodes
 
     // auxiliary fields
     bool selected = false;
@@ -141,7 +141,7 @@ public:
      */
     bool addEdge(std::string &sourc, std::string &dest, int driving, int walking);
     bool removeEdge(const T &source, const T &dest);
-    bool addBidirectionalEdge(const T &sourc, const T &dest, double w);
+    bool addBidirectionalEdge(const T &sourc, const T &dest, int drivingTime, int walkingTime);
 
     int getNumVertex() const;
 
@@ -292,7 +292,7 @@ unsigned int Vertex<T>::getIndegree() const {
 }
 
 template <class T>
-double Vertex<T>::getDist() const {
+int Vertex<T>::getDist() const {
     return this->dist;
 }
 
@@ -332,7 +332,7 @@ void Vertex<T>::setIndegree(unsigned int indegree) {
 }
 
 template <class T>
-void Vertex<T>::setDist(double dist) {
+void Vertex<T>::setDist(int dist) {
     this->dist = dist;
 }
 
@@ -343,7 +343,7 @@ void Vertex<T>::setPath(Edge<T> *path) {
 
 template <class T>
 void Vertex<T>::setWalkingPath(Edge<T> *path) {
-    this->path = path;
+    this->walkingPath = path;
 }
 
 template <class T>
@@ -525,13 +525,13 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 }
 
 template <class T>
-bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, double w) {
+bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, int drivingTime, int walkingTime) {
     auto v1 = findVertex(sourc);
     auto v2 = findVertex(dest);
     if (v1 == nullptr || v2 == nullptr)
         return false;
-    auto e1 = v1->addEdge(v2, w);
-    auto e2 = v2->addEdge(v1, w);
+    auto e1 = v1->addEdge(v2, drivingTime, walkingTime);
+    auto e2 = v2->addEdge(v1, drivingTime, walkingTime);
     e1->setReverse(e2);
     e2->setReverse(e1);
     return true;
@@ -595,7 +595,7 @@ template <class T>
 void cleanUp(const std::vector<Vertex<T>*>& visitedVertices) {
     for (Vertex<T>* v : visitedVertices) {
         v->setVisited(false);
-        v->setDist(std::numeric_limits<double>::max());
+        v->setDist(std::numeric_limits<int>::max());
     }
 }
 

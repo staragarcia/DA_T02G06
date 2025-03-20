@@ -15,11 +15,13 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
     pq.insert(source);
     while (!pq.empty()) {
         Vertex<T>* v = pq.extractMin();
+        std::cout << "Popped: " << v->getId() << " with dist " << v->getDist() << std::endl;
         if (v->getDist() > maxWalkTime) {
             cleanUp(visitedVertices);
             return;
         }
         if (v->getParking() && v != source) {
+            std::cout << "Inserting " << v->getId() << " with dist " << v->getDist() << std::endl;
             reacheableVertices.insert({v, v->getDist()});
         }
         for (Edge<T>* e : v->getIncoming()) {
@@ -28,6 +30,7 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
                 continue;
             }
             if (u->getDist() > v->getDist() + e->getWalkingTime()) {
+                std::cout << "Relax: " << u->getId() << " with dist " << v->getDist() << " + " << e->getWalkingTime() << std::endl;
                 u->setDist(v->getDist() + e->getWalkingTime());
                 u->setWalkingPath(e);
                 if (!u->isVisited()) {
@@ -44,11 +47,11 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
 }
 
 template <class T>
-void drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_map<Vertex<T>*, double>& reacheableWalkingVertices, Vertex<T>* parkingNode, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
+Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_map<Vertex<T>*, double>& reacheableWalkingVertices, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
     if (source == nullptr) {
-        return;
+        return nullptr;
     }
-    parkingNode = nullptr;
+    Vertex<T>* parkingNode = nullptr;
     double parkingNodeCost = std::numeric_limits<double>::max();
     int numReacheableWalkingVertices = reacheableWalkingVertices.size();
     source->setDist(0);
@@ -66,7 +69,7 @@ void drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_map<Ve
             }
             if (numReacheableWalkingVertices == 0) {
                 cleanUp(visitedVertices);
-                return;
+                return parkingNode;
             }
         }
         for (Edge<T>* e : v->getAdj()) {
@@ -88,20 +91,22 @@ void drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_map<Ve
         }
     }
     cleanUp(visitedVertices);
+    return parkingNode;
 }
 
 
 template <class T> 
 void getDrivingAndWalkingPath(Vertex<T>* parkingNode, std::list<T>& orderedIds) {
-    Vertex<T>* aux = parkingNode->getWalkingPath()->getDest();
-    while (aux != nullptr) {
-        orderedIds.push_back(aux->getId());
-        aux = aux->getWalkingPath()->getDest();
+    orderedIds.push_back(parkingNode->getId());
+    Edge<T>* aux_edge = parkingNode->getWalkingPath();
+    while (aux_edge != nullptr) {
+        orderedIds.push_back(aux_edge->getDest()->getId());
+        aux_edge = aux_edge->getDest()->getWalkingPath();
     }
-    aux = parkingNode->getPath()->getOrig();
-    while (aux != nullptr) {
-        orderedIds.push_front(aux->getId());
-        aux = aux->getPath()->getOrig();
+    aux_edge = parkingNode->getPath();
+    while (aux_edge != nullptr) {
+        orderedIds.push_front(aux_edge->getOrig()->getId());
+        aux_edge = aux_edge->getOrig()->getPath();
     }
 }
 
@@ -109,17 +114,15 @@ template <class T>
 void calculatePath(const Graph<T>& g, const T sourceId, T destId, const double maxWalkTime, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
     std::unordered_map<Vertex<T>*, double> reacheableWalkingVertices = {};
     walkingReverseDijsktra(g, g.findVertexById(destId), maxWalkTime, reacheableWalkingVertices, avoid_nodes, avoid_edges);
-    std::cout << "Reacheable walking vertices: ";
     for (auto it : reacheableWalkingVertices) {
-        std::cout << it.first->getId() << " " << it.second << " --- ";
+        std::cout << "Reacheable walking vertex: " << it.first->getId() << " with cost: " << it.second << std::endl;
     }
-    std::cout << std::endl;
-    Vertex<T>* parkingNode = nullptr;
-    drivingDijkstra(g, g.findVertexById(sourceId), reacheableWalkingVertices, parkingNode, avoid_nodes, avoid_edges);
+    Vertex<T>* parkingNode = drivingDijkstra(g, g.findVertexById(sourceId), reacheableWalkingVertices, avoid_nodes, avoid_edges);
     if (parkingNode == nullptr) {
         std::cout << "No path found" << std::endl;
         return;
     } else {
+        std::cout << "Path found parking at: " << parkingNode->getId() << std::endl;
         std::list<T> orderedIds = {};
         getDrivingAndWalkingPath(parkingNode, orderedIds);
         for (T id : orderedIds) {
@@ -135,6 +138,6 @@ int main () {
     readParseDistances(g);
     std::unordered_set<int> avoid_nodes = {};
     std::unordered_set<std::pair<int, int>, pairHash> avoid_edges = {{}};
-    calculatePath(g, 1, 15, 40, avoid_nodes, avoid_edges);
+    calculatePath(g, 1, 15, 5, avoid_nodes, avoid_edges);
     return 0;
 }

@@ -50,16 +50,14 @@ void readParseDistances(Graph<int> &g) {
         std::getline(ss, location1, ',');
         std::getline(ss, location2, ',');
         std::getline(ss, driving_str, ',');
-        ss.ignore();
         ss >> walking;
 
         int driving;
         if (driving_str == "X") {
             driving = std::numeric_limits<int>::max();  
         } else {
-            std::stringstream(driving_str) >> driving; 
+            std::stringstream(driving_str) >> driving;
         }
-        
         g.addEdge(location1, location2, driving, walking);
     }
 }
