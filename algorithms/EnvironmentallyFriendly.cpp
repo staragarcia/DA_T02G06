@@ -1,6 +1,7 @@
 #include "../utils/Graph.h"
 #include "../utils/GraphInitialization.cpp"
 #include "../utils/PairHash.hpp"
+#include "../utils/GetDrivingPath.hpp"
 #include <unordered_set>
 #include <list>
 
@@ -94,17 +95,12 @@ Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_
 
 template <class T> 
 void getDrivingAndWalkingPath(Vertex<T>* parkingNode, std::list<T>& orderedIds) {
-    orderedIds.push_back(parkingNode->getId());
     Edge<T>* aux_edge = parkingNode->getWalkingPath();
     while (aux_edge != nullptr) {
         orderedIds.push_back(aux_edge->getDest()->getId());
         aux_edge = aux_edge->getDest()->getWalkingPath();
     }
-    aux_edge = parkingNode->getPath();
-    while (aux_edge != nullptr) {
-        orderedIds.push_front(aux_edge->getOrig()->getId());
-        aux_edge = aux_edge->getOrig()->getPath();
-    }
+    getDrivingPath(parkingNode, orderedIds);
 }
 
 template <class T>
