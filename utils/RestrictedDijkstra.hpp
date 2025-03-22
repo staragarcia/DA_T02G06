@@ -5,9 +5,10 @@
 #include <unordered_set>
 
 template <class T>
-void RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
+int RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
+    int a;
     if (source == nullptr) {
-        return;
+        return 0;
     }
     source->setDist(0);
     MutablePriorityQueue<Vertex<T>> pq;
@@ -16,8 +17,9 @@ void RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, c
     while (!pq.empty()) {
         Vertex<T>* v = pq.extractMin();
         if (v == dest) {
+            a = dest->getDist();
             cleanUp(visitedVertices);
-            return;
+            return a;
         }
         for (Edge<T>* e : v->getAdj()) {
             Vertex<T>* u = e->getDest();
@@ -37,5 +39,7 @@ void RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, c
             }
         }
     }
+    a = dest->getDist();
     cleanUp(visitedVertices);
+    return a;
 }
