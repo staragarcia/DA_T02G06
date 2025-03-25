@@ -602,6 +602,7 @@ void cleanUpVisitedAndDist(const std::vector<Vertex<T>*>& visitedVertices) {
     for (Vertex<T>* v : visitedVertices) {
         v->setVisited(false);
         v->setDist(std::numeric_limits<int>::max());
+        v->setProcessing(false);
     }
 }
 

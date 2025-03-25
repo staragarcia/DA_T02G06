@@ -11,11 +11,16 @@
 #include "../utils/RestrictedDijkstra.hpp"
 #include "../utils/GetDrivingPath.hpp"
 #include "../algorithms/IndependentRoutePlanning.cpp"
+#include "../algorithms/RestrictedRoutePlanning.cpp"
 #include "../utils/GraphInitialization.cpp"
 
 using namespace std;
 
 void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
+    if (path.empty()) {
+        outputFile << "none\n";
+        return;
+    }
     bool first = true;
     for (int node : path) {
         if (!first) outputFile << ",";
@@ -23,15 +28,6 @@ void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
         first = false;
     }
     outputFile << "(" << cost << ")\n";
-}
-
-void outputIndependentRoutePlanning(list<int>& bestPath, int bestTime, list<int>& altPath, int altTime, ofstream& outputFile) {
-    // Print Best Route
-    outputFile << "BestDrivingRoute:";
-    outputPathAndCost(bestPath, bestTime, outputFile);
-    // Print Alternative Route
-    outputFile << "AlternativeDrivingRoute:";
-    outputPathAndCost(altPath, altTime, outputFile);
 }
 
 void processBatchMode(Graph<int>& graph) {
@@ -63,6 +59,24 @@ void processBatchMode(Graph<int>& graph) {
             sourceId = stoi(value);
         } else if (key == "Destination") {
             destinationId = stoi(value);
+        } else if (key == "AvoidNodes") {
+            stringstream nodesStream(value);
+            string node;
+            while (getline(nodesStream, node, ',')) {
+            avoidNodes.insert(stoi(node));
+            }
+        } else if (key == "AvoidSegments") {
+            regex segmentRegex(R"(\((\d+),(\d+)\))");
+            smatch match;
+            string::const_iterator searchStart(value.cbegin());
+            while (regex_search(searchStart, value.cend(), match, segmentRegex)) {
+            int from = stoi(match[1]);
+            int to = stoi(match[2]);
+            avoidEdges.insert({from, to});
+            searchStart = match.suffix().first;
+            }
+        } else if (key == "IncludeNode") {
+            includeNode = stoi(value);
         }
     }
 
@@ -92,7 +106,18 @@ void processBatchMode(Graph<int>& graph) {
         // Find the Best Route
         IndependentRoutePlanning(graph, source, destination, bestPath, bestTime, altPath, altTime);
 
-        outputIndependentRoutePlanning(bestPath, bestTime, altPath, altTime, outputFile);
+        // Print Best Route
+        outputFile << "BestDrivingRoute:";
+        outputPathAndCost(bestPath, bestTime, outputFile);
+        // Print Alternative Route
+        outputFile << "AlternativeDrivingRoute:";
+        outputPathAndCost(altPath, altTime, outputFile);
+    } else if (mode == "driving") {
+        list<int> bestPath = {};
+        int bestTime = -1;
+        int time = RestrictedRoutePlanning(graph, source, destination, avoidNodes, avoidEdges, graph.findVertexById(includeNode), bestPath);
+        outputFile << "RestrictedDrivingRoute:";
+        outputPathAndCost(bestPath, time, outputFile);
     }
     
 

@@ -16,16 +16,17 @@
  */
 template <class T>
 int RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges, std::vector<Vertex<T>*>& visitedVertices) {
-    int time;
     if (source == nullptr) {
         return 0;
     }
+    int time;
     source->setDist(0);
     MutablePriorityQueue<Vertex<T>> pq;
     visitedVertices.push_back(source);
     pq.insert(source);
     while (!pq.empty()) {
         Vertex<T>* v = pq.extractMin();
+        v->setProcessing(false);
         if (v == dest) {
             time = dest->getDist();
             cleanUpVisitedAndDist(visitedVertices);
@@ -33,23 +34,24 @@ int RestrictedDijkstra(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, co
         }
         for (Edge<T>* e : v->getAdj()) {
             Vertex<T>* u = e->getDest();
-            if (avoid_nodes.find(u->getId()) != avoid_nodes.end() || avoid_edges.find({v->getId(), u->getId()}) != avoid_edges.end()) {
+            if (v->getDist() == std::numeric_limits<int>::max() || e->getDrivingTime() == std::numeric_limits<int>::max() || (u->isVisited()&&!u->isProcessing())  || avoid_nodes.find(u->getId()) != avoid_nodes.end() || avoid_edges.find({v->getId(), u->getId()}) != avoid_edges.end()) {
                 continue;
             }
-            if (u->getDist() > v->getDist() + e->getDrivingTime()) {
-                u->setDist(v->getDist() + e->getDrivingTime());
+            int cost = v->getDist() + e->getDrivingTime();
+            if (u->getDist() > cost) {
+                u->setDist(cost);
                 u->setPath(e);
                 if (!u->isVisited()) {
                     pq.insert(u);
                     u->setVisited(true);
+                    u->setProcessing(true);
                     visitedVertices.push_back(u);
-                } else {
+                } else if (u->isProcessing()) {
                     pq.decreaseKey(u);
                 }
             }
         }
     }
-    time = dest->getDist();
     cleanUpVisitedAndDist(visitedVertices);
-    return time;
+    return -1;
 }
