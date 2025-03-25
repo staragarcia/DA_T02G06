@@ -15,25 +15,23 @@
 
 using namespace std;
 
-void outputIndependentRoutePlanning(std::list<int>& bestPath, int bestTime, std::list<int>& altPath, int altTime, ofstream& outputFile) {
+void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
+    bool first = true;
+    for (int node : path) {
+        if (!first) outputFile << ",";
+        outputFile << node;
+        first = false;
+    }
+    outputFile << "(" << cost << ")\n";
+}
+
+void outputIndependentRoutePlanning(list<int>& bestPath, int bestTime, list<int>& altPath, int altTime, ofstream& outputFile) {
     // Print Best Route
     outputFile << "BestDrivingRoute:";
-    bool first = true;
-    for (int node : bestPath) {
-        if (!first) outputFile << ",";
-        outputFile << node;
-        first = false;
-    }
-    outputFile << "(" << bestTime << ")\n";
+    outputPathAndCost(bestPath, bestTime, outputFile);
     // Print Alternative Route
     outputFile << "AlternativeDrivingRoute:";
-    first = true;
-    for (int node : altPath) {
-        if (!first) outputFile << ",";
-        outputFile << node;
-        first = false;
-    }
-    outputFile << "(" << altTime << ")\n";
+    outputPathAndCost(altPath, altTime, outputFile);
 }
 
 void processBatchMode(Graph<int>& graph) {
