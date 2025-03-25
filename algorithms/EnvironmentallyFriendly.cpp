@@ -8,18 +8,18 @@
 #include <list>
 
 template <class T>
-void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double maxWalkTime, std::unordered_map<Vertex<T>*, double>& reacheableVertices, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges) {
+void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double maxWalkTime, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges, std::unordered_map<Vertex<T>*, double>& reacheableVertices, std::vector<Vertex<T>*>& visitedVertices) {
     if (source == nullptr) {
         return;
     }
     source->setDist(0);
     MutablePriorityQueue<Vertex<T>> pq;
-    std::vector<Vertex<T>*> visitedVertices = {source};
+    visitedVertices.push_back(source);
     pq.insert(source);
     while (!pq.empty()) {
         Vertex<T>* v = pq.extractMin();
         if (v->getDist() > maxWalkTime) {
-            cleanUp(visitedVertices);
+            cleanUpVisitedAndDist(visitedVertices);
             return;
         }
         if (v->getParking() && v != source) {
@@ -43,11 +43,11 @@ void walkingReverseDijsktra(const Graph<T>& g, Vertex<T>* source, const double m
             }
         }
     }
-    cleanUp(visitedVertices);
+    cleanUpVisitedAndDist(visitedVertices);
 }
 
 template <class T>
-Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_map<Vertex<T>*, double>& reacheableWalkingVertices, const std::unordered_set<T>& avoidNodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoidEdges, int& totalTime) {
+Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, const std::unordered_set<T>& avoidNodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoidEdges, std::unordered_map<Vertex<T>*, double>& reacheableWalkingVertices, int& totalTime, std::vector<Vertex<T>*>& visitedVertices) {
    if (source == nullptr) {
        return nullptr;
    }
@@ -56,7 +56,7 @@ Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_
    int numReacheableWalkingVertices = reacheableWalkingVertices.size();
    source->setDist(0);
    MutablePriorityQueue<Vertex<T>> pq;
-   std::vector<Vertex<T>*> visitedVertices = {source};
+   visitedVertices.push_back(source);
    pq.insert(source);
    while (!pq.empty()) {
       Vertex<T>* v = pq.extractMin();
@@ -68,7 +68,7 @@ Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_
             parkingNodeCost = it->second;
          }
          if (numReacheableWalkingVertices == 0) {
-            cleanUp(visitedVertices);
+            cleanUpVisitedAndDist(visitedVertices);
             totalTime = parkingNodeCost;
             return parkingNode;
          }
@@ -91,7 +91,7 @@ Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, std::unordered_
          }
       }
    }
-   cleanUp(visitedVertices);
+   cleanUpVisitedAndDist(visitedVertices);
    totalTime=parkingNodeCost;
    return parkingNode;
 }
@@ -114,12 +114,14 @@ void getDrivingAndWalkingPath(Vertex<T>* parkingNode, std::list<T>& orderedIds) 
 template <class T>
 int calculateEnvironmentallyFriendlyPath(const Graph<T>& g, const T sourceId, T destId, const double maxWalkTime, const std::unordered_set<T>& avoid_nodes, const std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges, std::list<T>& path, T& parkingNodeId) {
     std::unordered_map<Vertex<T>*, double> reacheableWalkingVertices = {};
-    walkingReverseDijsktra(g, g.findVertexById(destId), maxWalkTime, reacheableWalkingVertices, avoid_nodes, avoid_edges);
+    std::vector<Vertex<T>*> visitedVertices = {};
+    walkingReverseDijsktra(g, g.findVertexById(destId), maxWalkTime, avoid_nodes, avoid_edges, reacheableWalkingVertices, visitedVertices);
     int totalTime;
-    Vertex<T>* parkingNode = drivingDijkstra(g, g.findVertexById(sourceId), reacheableWalkingVertices, avoid_nodes, avoid_edges, totalTime);
+    Vertex<T>* parkingNode = drivingDijkstra(g, g.findVertexById(sourceId), avoid_nodes, avoid_edges, reacheableWalkingVertices, totalTime, visitedVertices);
     parkingNodeId=parkingNode->getId();
     std::list<T> orderedIds = {};
     getDrivingAndWalkingPath(parkingNode, orderedIds);
+    g->cleanUpPaths(visitedVertices);
     path = orderedIds;
     return totalTime;
 }

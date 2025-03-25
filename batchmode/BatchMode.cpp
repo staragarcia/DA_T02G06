@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -13,6 +15,26 @@
 
 using namespace std;
 
+void outputIndependentRoutePlanning(std::list<int>& bestPath, int bestTime, std::list<int>& altPath, int altTime, ofstream& outputFile) {
+    // Print Best Route
+    outputFile << "BestDrivingRoute:";
+    bool first = true;
+    for (int node : bestPath) {
+        if (!first) outputFile << ",";
+        outputFile << node;
+        first = false;
+    }
+    outputFile << "(" << bestTime << ")\n";
+    // Print Alternative Route
+    outputFile << "AlternativeDrivingRoute:";
+    first = true;
+    for (int node : altPath) {
+        if (!first) outputFile << ",";
+        outputFile << node;
+        first = false;
+    }
+    outputFile << "(" << altTime << ")\n";
+}
 
 void processBatchMode(Graph<int>& graph) {
     // INPUT //
@@ -66,44 +88,13 @@ void processBatchMode(Graph<int>& graph) {
     // INDEPENDENT ROUTE PLANNING //
     if (mode == "driving" && avoidNodes.empty() && avoidEdges.empty() && includeNode == -1) {
 
-        list<int> bestPath, altPath;
-        unordered_set<int> usedNodes;
+        list<int> bestPath = {}, altPath = {};
         int bestTime = -1, altTime = -1;
 
         // Find the Best Route
-        bestPath = IndependentRoutePlanning(graph, source, destination);
-        bestTime = RestrictedDijkstra(graph, source, destination, {}, {{}});
+        IndependentRoutePlanning(graph, source, destination, bestPath, bestTime, altPath, altTime);
 
-        for (int node : bestPath) {
-            if (node != sourceId && node != destinationId) {
-                usedNodes.insert(node);
-            }
-        }
-
-        // Find the Alternative Route
-        altTime = RestrictedDijkstra(graph, source, destination, usedNodes, {{}});
-        getDrivingPath(destination, altPath);
-
-        
-        // Print Best Route
-        outputFile << "BestDrivingRoute:";
-        bool first = true;
-        for (int node : bestPath) {
-            if (!first) outputFile << ",";
-            outputFile << node;
-            first = false;
-        }
-        outputFile << "(" << bestTime << ")\n";
-
-        // Print Alternative Route
-        outputFile << "AlternativeDrivingRoute:";
-        first = true;
-        for (int node : altPath) {
-            if (!first) outputFile << ",";
-            outputFile << node;
-            first = false;
-        }
-        outputFile << "(" << altTime << ")\n";
+        outputIndependentRoutePlanning(bestPath, bestTime, altPath, altTime, outputFile);
     }
     
 

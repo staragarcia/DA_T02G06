@@ -3,6 +3,13 @@
 #include "Graph.h"
 #include <list>
 
+/**
+ * @brief Read the path that leads to a vertex from the vertices
+ * 
+ * @tparam T template parameter related to the type of vertice
+ * @param destNode Last vertice on the path
+ * @param orderedIds initialized list where the ids of the vertices on the path will be put
+ */
 template <class T> 
 void getDrivingPath(Vertex<T>* destNode, std::list<T>& orderedIds) {
     if (destNode == nullptr) {
