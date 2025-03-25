@@ -6,7 +6,7 @@
 #include <limits>
 
 void readParseLocations(Graph<int> &g) {
-    std::ifstream file("datasets/ExampleLocations.csv");
+    std::ifstream file("datasets/Locations.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }
@@ -32,7 +32,7 @@ void readParseLocations(Graph<int> &g) {
 }
 
 void readParseDistances(Graph<int> &g) {
-    std::ifstream file("datasets/ExampleDistances.csv");
+    std::ifstream file("datasets/Distances.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }

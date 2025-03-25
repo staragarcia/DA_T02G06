@@ -591,11 +591,32 @@ Graph<T>::~Graph() {
     deleteMatrix(pathMatrix, vertexSet.size());
 }
 
+/**
+ * @brief Cleans the visited and dist fields of vertices
+ * 
+ * @tparam T 
+ * @param visitedVertices Vertices that were affected by the Dijkstra
+ */
 template <class T>
-void cleanUp(const std::vector<Vertex<T>*>& visitedVertices) {
+void cleanUpVisitedAndDist(const std::vector<Vertex<T>*>& visitedVertices) {
     for (Vertex<T>* v : visitedVertices) {
         v->setVisited(false);
         v->setDist(std::numeric_limits<int>::max());
+        v->setProcessing(false);
+    }
+}
+
+/**
+ * @brief Cleans the path fields of vertices
+ * 
+ * @tparam T 
+ * @param visitedVertices Vertices that were affected by the Dijkstra
+ */
+template <class T>
+void cleanUpPaths(const std::vector<Vertex<T>*>& visitedVertices) {
+    for (Vertex<T>* v : visitedVertices) {
+        v->setPath(nullptr);
+        v->setWalkingPath(nullptr);
     }
 }
 
