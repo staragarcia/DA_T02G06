@@ -13,16 +13,6 @@ void copyIfBetter(std::list<T>& path1, T& parkingNodeId1, int& walkingTime1, int
 }
 
 template <class T> 
-void upHeapPath(std::list<T>& path1, T& parkingNodeId1, int& walkingTime1, int& drivingTime1,  std::list<T>& path2, T& parkingNodeId2, int& walkingTime2, int& drivingTime2, std::list<T>& tempPath, T& tempParkingNodeId, int& tempWalkingTime, int& tempDrivingTime) {
-    if (tempWalkingTime + tempDrivingTime < walkingTime1 + drivingTime1) {
-        copyIfBetter(path2, parkingNodeId2, walkingTime2, drivingTime2, path1, parkingNodeId1, walkingTime1, drivingTime1);
-        copyIfBetter(path1, parkingNodeId1, walkingTime1, drivingTime1, tempPath, tempParkingNodeId, tempWalkingTime, tempDrivingTime);
-    } else if (tempWalkingTime + tempDrivingTime < walkingTime2 + drivingTime2) {
-        copyIfBetter(path2, parkingNodeId2, walkingTime2, drivingTime2, tempPath, tempParkingNodeId, tempWalkingTime, tempDrivingTime);
-    }
-}
-
-template <class T> 
 void getBestAlternative(const Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, const int maxWalkTime, const std::unordered_set<T>& avoid_nodes, std::unordered_set<std::pair<T, T>, pairHash>& avoid_edges, std::list<T>& previousPath, std::list<T>& altPath, int& altDrivingTime, int& altWalkingTime, T& altParkingNodeId) {
     std::vector<std::pair<int,int>> newAvoidEdges= {};
     T node = previousPath.front();
