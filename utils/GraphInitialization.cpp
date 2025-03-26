@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,7 +8,7 @@
 #include <limits>
 
 void readParseLocations(Graph<int> &g) {
-    std::ifstream file("datasets/Locations.csv");
+    std::ifstream file("datasets/locations.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }
@@ -26,13 +28,12 @@ void readParseLocations(Graph<int> &g) {
         ss.ignore(); 
         std::getline(ss, code, ',');
         ss >> parking;
-        
         g.addVertex(location, id, code, parking);
     }
 }
 
 void readParseDistances(Graph<int> &g) {
-    std::ifstream file("datasets/Distances.csv");
+    std::ifstream file("datasets/distances.csv");
     if (!file.is_open()) {
         std::cout << "Error opening file!\n";
     }
@@ -58,6 +59,6 @@ void readParseDistances(Graph<int> &g) {
         } else {
             std::stringstream(driving_str) >> driving;
         }
-        g.addEdge(location1, location2, driving, walking);
+        g.addBidirectionalEdge(location1, location2, driving, walking);
     }
 }
