@@ -1,4 +1,15 @@
-Source:1
-Destination:173
-BestDrivingRoute:1,1045,485,191,173(13)
-AlternativeDrivingRoute:1,1113,45,697,719,219,936,338,919,173(29)
+Source:8
+Destination:5
+DrivingRoute:none
+ParkingNode:none
+WalkingRoute:none
+TotalTime:
+Message:Could not find a path with maximum walking time constraint.
+DrivingRoute1:8,4,2,3(19)
+ParkingNode1:3
+WalkingRoute1:3,5(10)
+TotalTime1:29
+DrivingRoute2:8,4,6(21)
+ParkingNode2:6
+WalkingRoute2:6,5(10)
+TotalTime2:31

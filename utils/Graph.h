@@ -141,7 +141,7 @@ public:
      */
     bool addEdge(std::string &sourc, std::string &dest, int driving, int walking);
     bool removeEdge(const T &source, const T &dest);
-    bool addBidirectionalEdge(const T &sourc, const T &dest, int drivingTime, int walkingTime);
+    bool addBidirectionalEdge(const std::string &sourc, const std::string &dest, int drivingTime, int walkingTime);
 
     int getNumVertex() const;
 
@@ -525,7 +525,7 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 }
 
 template <class T>
-bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, int drivingTime, int walkingTime) {
+bool Graph<T>::addBidirectionalEdge(const std::string &sourc, const std::string &dest, int drivingTime, int walkingTime) {
     auto v1 = findVertex(sourc);
     auto v2 = findVertex(dest);
     if (v1 == nullptr || v2 == nullptr)
