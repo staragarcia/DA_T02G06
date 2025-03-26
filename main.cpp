@@ -4,6 +4,9 @@
 
 using namespace std;
 
+/**
+ * @brief Displays the main menu for the Route Planning Analysis Tool.
+ */
 void displayMenu() {
     cout << "\n===== Route Planning Analysis Tool =====\n";
     cout << "1. Find fastest route\n";
@@ -46,6 +49,7 @@ void runBatchMode() {
     // Process batch mode
     processBatchMode(graph);
 }
+
 
 int main() {
     int option;
