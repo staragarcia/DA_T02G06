@@ -25,7 +25,7 @@ using namespace std;
  * @param cost The total cost of the path.
  * @param outputFile The output file stream.
  */
-void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
+void outputPathAndCost(list<int>& path, int cost, ostream& outputFile) {
     if (path.size() < 2 || cost < 0) {
         outputFile << "none\n";
         return;

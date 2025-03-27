@@ -26,6 +26,7 @@ void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &d
     cin >> sourceId;
     while (!(source = g.findVertexById(sourceId))) {
         cout << "Error: Invalid source. Try again: ";
+        cin.ignore();
         cin >> sourceId;
     }
 
@@ -33,6 +34,7 @@ void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &d
     cin >> destinationId;
     while (!(destination = g.findVertexById(destinationId))) {
         cout << "Error: Invalid destination. Try again: ";
+        cin.ignore();
         cin >> destinationId;
     }
 
