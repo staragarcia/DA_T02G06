@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 /**
- * @brief Runs a Dijkstra algorithm on a graph, finding a path from the source to the dest node, while avoiding certain nodes and edges
+ * @brief Runs a Dijkstra algorithm on a graph, finding a path from the source to the dest node, while avoiding certain nodes and edges. Total time complexity is O(log(V)(E+V)) where V is the number of vertices and E is the number of edges.
  * 
  * @tparam T 
  * @param g graph where the path will be found
