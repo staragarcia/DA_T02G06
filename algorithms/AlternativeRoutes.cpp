@@ -64,7 +64,7 @@ std::string AlternativeRoutes(const Graph<T>& g, Vertex<T>* source, Vertex<T>* d
         if (err == 0) {
             copyIfBetter(path1, parkingNodeId1, walkingTime1, drivingTime1, tempPath, tempParkingNodeId, tempWalkingTime, tempDrivingTime);
             getBestAlternative(g, source, dest, std::numeric_limits<int>::max(), avoid_nodes, avoid_edges, path1, path2, drivingTime2, walkingTime2, parkingNodeId2);
-            return "Could not find a path with maximum walking time constraint.";
+            return "No possible route with max. walking time of " + std::to_string(maxWalkTime) + " minutes.";
         }
     }
     // Try removing edge avoidance constraint

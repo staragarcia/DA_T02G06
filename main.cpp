@@ -10,7 +10,7 @@ using namespace std;
  * @brief Displays the main menu for the Route Planning Analysis Tool.
  */
 void displayMenu() {
-    cout << "\n===== Route Planning Analysis Tool =====\n";
+    cout << "\n=====| Route Planning Analysis Tool |=====\n";
     cout << "1. Independent Route Planning\n";
     cout << "2. Restricted Route Planning\n";
     cout << "3. Environmentally-Friendly Route Planning (driving and walking)\n";
@@ -19,7 +19,7 @@ void displayMenu() {
     cout << "Enter your option: ";
 }
 
-void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &destination) {
+void readSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &destination) {
     int sourceId;
     int destinationId;
 
@@ -39,12 +39,12 @@ void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &d
 }
 
 void independentRoute(Graph<int> &g) {
-    cout << "Finding shortest route...\n";
+    cout << "Finding best and alternative routes...\n";
 
     Vertex<int>* source = nullptr;
     Vertex<int>* destination = nullptr;
 
-    validateSourceAndDest(g, source, destination);
+    readSourceAndDest(g, source, destination);
 
     list<int> bestPath = {}, altPath = {};
     int bestTime = -1, altTime = -1;
@@ -52,6 +52,9 @@ void independentRoute(Graph<int> &g) {
     // Find the Best Route
     IndependentRoutePlanning(g, source, destination, bestPath, bestTime, altPath, altTime);
 
+    cout << "\n========| OUTPUT |========\n";
+    // Print Source and Destination
+    outputSourceDest(source->getId(), destination->getId(), cout);
     // Print Best Route
     cout << "BestDrivingRoute:";
     outputPathAndCost(bestPath, bestTime, cout);
@@ -61,12 +64,12 @@ void independentRoute(Graph<int> &g) {
 }
 
 void restrictedRoute(Graph<int> &g) {
-    cout << "Finding second-shortest route...\n";
+    cout << "Finding restricted route...\n";
 
     Vertex<int>* source = nullptr;
     Vertex<int>* destination = nullptr;
 
-    validateSourceAndDest(g, source, destination);
+    readSourceAndDest(g, source, destination);
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     unordered_set<int> avoidNodes = {};
@@ -117,6 +120,8 @@ void restrictedRoute(Graph<int> &g) {
     
     list<int> bestPath = {};
     int bestTime = -1;
+    cout << "\n========| OUTPUT |========\n";
+    outputSourceDest(source->getId(), destination->getId(), cout);
     int time = RestrictedRoutePlanning(g, source, destination, avoidNodes, avoidEdges, g.findVertexById(includeNode), bestPath);
     cout << "RestrictedDrivingRoute:";
     outputPathAndCost(bestPath, time, cout);
@@ -124,8 +129,78 @@ void restrictedRoute(Graph<int> &g) {
 }
 
 void EFriendlyRoute(Graph<int> &g) {
-    cout << "Planning route with restrictions...\n";
-    // Add logic for restricted route
+    cout << "Finding environmentally-friendly route...\n";
+
+    Vertex<int>* source = nullptr;
+    Vertex<int>* destination = nullptr;
+
+    readSourceAndDest(g, source, destination);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+
+    int maxWalkTime;
+    std::string input;
+
+    cout << "MaxWalkTime:";
+    std::getline(std::cin, input); 
+    
+    while (input.empty()) {
+        cout << "Error: MaxWalkTime is obligatory. Try again:";
+    }
+
+    unordered_set<int> avoidNodes = {};
+
+    cout << "AvoidNodes:";
+    std::getline(std::cin, input); 
+
+    if (!input.empty()) {
+        stringstream ss(input);
+        string current;
+
+        while (std::getline(ss, current, ',')) {
+            avoidNodes.insert(stoi(current));
+        }
+    }
+        
+    unordered_set<pair<int, int>, pairHash> avoidEdges = {};
+    
+    cout << "AvoidSegments:";
+    std::getline(std::cin, input); 
+
+    if (!input.empty()) {
+        regex segmentRegex(R"(\((\d+),(\d+)\))");
+        smatch match;
+        string::const_iterator searchStart(input.cbegin());
+        while (regex_search(searchStart, input.cend(), match, segmentRegex)) {
+            try {
+                int from = stoi(match[1]);
+                int to = stoi(match[2]);
+                avoidEdges.insert({from, to});
+                searchStart = match.suffix().first;
+            } catch (invalid_argument& e) {
+                cout << "Error: Invalid edge to avoid. " << match[1] << "," << match[2] << "\n";
+                return;
+            }
+        }
+    }
+
+    list<int> path = {};
+    int parkingNodeId;
+    int walkingTime, drivingTime;
+    cout << "\n========| OUTPUT |========\n";
+    int err = calculateEnvironmentallyFriendlyPath(g, source, destination, maxWalkTime, avoidNodes, avoidEdges, path, parkingNodeId, walkingTime, drivingTime);
+    if (err != 0) {
+        cout << "DrivingRoute:\nParkingNode:\nWalkingRoute:\nTotalTime:\nMessage:";
+        int parkingNodeId1, parkingNodeId2;
+        int walkingTime1 = std::numeric_limits<int>::max(), walkingTime2= std::numeric_limits<int>::max(), drivingTime1= std::numeric_limits<int>::max(), drivingTime2= std::numeric_limits<int>::max();
+        std::list<int> path1 = {}, path2 = {};
+        std::string message = AlternativeRoutes(g, source, destination, maxWalkTime, avoidNodes, avoidEdges, path1, parkingNodeId1, walkingTime1, drivingTime1, path2, parkingNodeId2, walkingTime2, drivingTime2);
+        cout << message << "\n";
+        outputDrivingWalkingPath(path1, parkingNodeId1, cout, drivingTime1, walkingTime1, "1");
+        outputDrivingWalkingPath(path2, parkingNodeId2, cout, drivingTime2, walkingTime2, "2");
+    } else if (err == 0) {
+        outputDrivingWalkingPath(path, parkingNodeId, cout, drivingTime, walkingTime, "");
+    }
 }
 
 void runBatchMode(Graph<int> &g) {

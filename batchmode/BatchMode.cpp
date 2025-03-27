@@ -19,6 +19,18 @@
 using namespace std;
 
 /**
+ * @brief Outputs the source and destination, since it's needed in the beggining of each output.
+ * 
+ * @param sourceId The id of the source node
+ * @param destinationId The id of the destination node
+ * @param outputFile The output file stream.
+ */
+void outputSourceDest (int sourceId, int destinationId, ostream& outputFile) {
+    outputFile << "Source:" << sourceId << "\n";
+    outputFile << "Destination:" << destinationId << "\n";
+}
+
+/**
  * @brief Outputs the given path and cost to a file.
  * 
  * @param path The list of nodes representing the path.
@@ -74,7 +86,7 @@ void parseDrivingWalkingPath(list<int>& path, int parkingNodeId, list<int>& driv
  * @param walkingTime The time taken for the walking portion.
  * @param mode The mode identifier for the output.
  */
-void outputDrivingWalkingPath(list<int>& path, int parkingNodeId, ofstream& outputFile, int& drivingTime, int& walkingTime, string mode) {
+void outputDrivingWalkingPath(list<int>& path, int parkingNodeId, ostream& outputFile, int& drivingTime, int& walkingTime, string mode) {
     list<int> drivingPath = {};
     list<int> walkingPath = {};
     parseDrivingWalkingPath(path, parkingNodeId, drivingPath, walkingPath);
@@ -214,8 +226,7 @@ void processBatchMode(Graph<int>& graph) {
         return;
     }
 
-    outputFile << "Source:" << sourceId << "\n";
-    outputFile << "Destination:" << destinationId << "\n";
+    outputSourceDest(sourceId, destinationId, outputFile);
 
     if (mode == "driving" && avoidNodes.empty() && avoidEdges.empty() && includeNode == -1) {
 
@@ -243,7 +254,7 @@ void processBatchMode(Graph<int>& graph) {
         int walkingTime, drivingTime;
         int err = calculateEnvironmentallyFriendlyPath(graph, source, destination, maxWalkTime, avoidNodes, avoidEdges, path, parkingNodeId, walkingTime, drivingTime);
         if (err != 0) {
-            outputFile << "DrivingRoute:none\nParkingNode:none\nWalkingRoute:none\nTotalTime:\nMessage:";
+            outputFile << "DrivingRoute:\nParkingNode:\nWalkingRoute:\nTotalTime:\nMessage:";
             int parkingNodeId1, parkingNodeId2;
             int walkingTime1 = std::numeric_limits<int>::max(), walkingTime2= std::numeric_limits<int>::max(), drivingTime1= std::numeric_limits<int>::max(), drivingTime2= std::numeric_limits<int>::max();
             std::list<int> path1 = {}, path2 = {};
