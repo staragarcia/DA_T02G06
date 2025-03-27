@@ -10,6 +10,7 @@
 
 /**
  * @brief Reads location data from a CSV file and adds it to the graph.
+ * Works in O(V) where V is the number of vertices.
  * 
  * Extracts location name, ID, code, and parking availability from 
  * `datasets/locations.csv` and adds vertices to the graph.
@@ -44,6 +45,7 @@ void readParseLocations(Graph<int> &g) {
 
 /**
  * @brief Reads distance data from a CSV file and adds edges to the graph.
+ * Works in O(E) where E is the number of edges.
  * 
  * Extracts locations, driving time, and walking time from `datasets/distances.csv` 
  * and adds bidirectional edges to the graph. 

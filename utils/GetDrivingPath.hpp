@@ -5,6 +5,7 @@
 
 /**
  * @brief Read the path that leads to a vertex from the vertices
+ * Runs in O(V) time where V is the number of vertices in the graph because the path's length is at most V-1.
  * 
  * @tparam T template parameter related to the type of vertice
  * @param destNode Last vertice on the path
