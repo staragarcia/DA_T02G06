@@ -7,6 +7,15 @@
 #include "Graph.h"
 #include <limits>
 
+
+/**
+ * @brief Reads location data from a CSV file and adds it to the graph.
+ * 
+ * Extracts location name, ID, code, and parking availability from 
+ * `datasets/locations.csv` and adds vertices to the graph.
+ * 
+ * @param g Reference to the Graph object.
+ */
 void readParseLocations(Graph<int> &g) {
     std::ifstream file("datasets/locations.csv");
     if (!file.is_open()) {
@@ -32,6 +41,15 @@ void readParseLocations(Graph<int> &g) {
     }
 }
 
+
+/**
+ * @brief Reads distance data from a CSV file and adds edges to the graph.
+ * 
+ * Extracts locations, driving time, and walking time from `datasets/distances.csv` 
+ * and adds bidirectional edges to the graph. 
+ * 
+ * @param g Reference to the Graph object.
+ */
 void readParseDistances(Graph<int> &g) {
     std::ifstream file("datasets/distances.csv");
     if (!file.is_open()) {
