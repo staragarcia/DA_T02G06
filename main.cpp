@@ -2,10 +2,11 @@
 #include "utils/Graph.h"
 #include "batchmode/BatchMode.cpp" // Include the BatchMode header
 #include <string>
+#include <regex>
 
 using namespace std;
 
-/**
+/**#include <regex>
  * @brief Displays the main menu for the Route Planning Analysis Tool.
  */
 void displayMenu() {
@@ -22,23 +23,19 @@ void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &d
     int sourceId;
     int destinationId;
 
-    cout << "Enter the source node id: ";
+    cout << "Source:";
     cin >> sourceId;
     while (!(source = g.findVertexById(sourceId))) {
         cout << "Error: Invalid source. Try again: ";
-        cin.ignore();
         cin >> sourceId;
     }
 
-    cout << "Enter the destination node id: ";
+    cout << "Destination:";
     cin >> destinationId;
     while (!(destination = g.findVertexById(destinationId))) {
         cout << "Error: Invalid destination. Try again: ";
-        cin.ignore();
         cin >> destinationId;
     }
-
-    cout << "\n";
 }
 
 void independentRoute(Graph<int> &g) {
@@ -70,6 +67,59 @@ void restrictedRoute(Graph<int> &g) {
     Vertex<int>* destination = nullptr;
 
     validateSourceAndDest(g, source, destination);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    unordered_set<int> avoidNodes = {};
+    std::string input;
+
+    cout << "AvoidNodes:";
+    std::getline(std::cin, input); 
+
+    if (!input.empty()) {
+        stringstream ss(input);
+        string current;
+
+        while (std::getline(ss, current, ',')) {
+            avoidNodes.insert(stoi(current));
+        }
+    }
+        
+    unordered_set<pair<int, int>, pairHash> avoidEdges = {};
+    
+    cout << "AvoidSegments:";
+    std::getline(std::cin, input); 
+
+    if (!input.empty()) {
+        regex segmentRegex(R"(\((\d+),(\d+)\))");
+        smatch match;
+        string::const_iterator searchStart(input.cbegin());
+        while (regex_search(searchStart, input.cend(), match, segmentRegex)) {
+            try {
+                int from = stoi(match[1]);
+                int to = stoi(match[2]);
+                avoidEdges.insert({from, to});
+                searchStart = match.suffix().first;
+            } catch (invalid_argument& e) {
+                cout << "Error: Invalid edge to avoid. " << match[1] << "," << match[2] << "\n";
+                return;
+            }
+        }
+    }
+
+    int includeNode;
+
+    cout << "IncludeNode:";
+    std::getline(std::cin, input); 
+    
+    if (!input.empty()) {
+        includeNode = stoi(input);
+    }
+    
+    list<int> bestPath = {};
+    int bestTime = -1;
+    int time = RestrictedRoutePlanning(g, source, destination, avoidNodes, avoidEdges, g.findVertexById(includeNode), bestPath);
+    cout << "RestrictedDrivingRoute:";
+    outputPathAndCost(bestPath, time, cout);
     
 }
 
@@ -118,5 +168,6 @@ int main() {
             case 5: cout << "Exiting...\n"; return 0;
             default: cout << "Invalid option! Please try again.\n";
         }
+        cout << "\n";
     }
 }
