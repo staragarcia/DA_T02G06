@@ -32,6 +32,7 @@ void outputSourceDest (int sourceId, int destinationId, ostream& outputFile) {
 
 /**
  * @brief Outputs the given path and cost to a file.
+ * Runs in O(V) time where V is the number of vertices in the graph because the path's length is at most V-1.
  * 
  * @param path The list of nodes representing the path.
  * @param cost The total cost of the path.
@@ -53,6 +54,7 @@ void outputPathAndCost(list<int>& path, int cost, ostream& outputFile) {
 
 /**
  * @brief Splits a driving and walking path into two separate lists.
+ * Runs in O(V) time where V is the number of vertices in the graph because the path's length is at most V-1.
  * 
  * @param path The full path including both driving and walking sections.
  * @param parkingNodeId The node where the switch from driving to walking occurs.
@@ -78,6 +80,7 @@ void parseDrivingWalkingPath(list<int>& path, int parkingNodeId, list<int>& driv
 
 /**
  * @brief Outputs the driving and walking portions of a path to a file.
+ * Runs in O(V) time where V is the number of vertices in the graph because the path's length is at most V-1.
  * 
  * @param path The full path including driving and walking sections.
  * @param parkingNodeId The node where the switch from driving to walking occurs.
