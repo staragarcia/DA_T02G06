@@ -147,6 +147,7 @@ void EFriendlyRoute(Graph<int> &g) {
     while (input.empty()) {
         cout << "Error: MaxWalkTime is obligatory. Try again:";
     }
+    maxWalkTime = stoi(input);
 
     unordered_set<int> avoidNodes = {};
 
