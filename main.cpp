@@ -5,6 +5,9 @@
 
 using namespace std;
 
+/**
+ * @brief Displays the main menu for the Route Planning Analysis Tool.
+ */
 void displayMenu() {
     cout << "\n===== Route Planning Analysis Tool =====\n";
     cout << "1. Independent Route Planning\n";
@@ -84,6 +87,7 @@ void runBatchMode(Graph<int> &g) {
     // Process batch mode
     processBatchMode(graph);
 }
+
 
 int main() {
     int option;

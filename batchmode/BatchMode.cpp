@@ -18,7 +18,14 @@
 
 using namespace std;
 
-void outputPathAndCost(list<int>& path, int cost, ostream& outputFile) {
+/**
+ * @brief Outputs the given path and cost to a file.
+ * 
+ * @param path The list of nodes representing the path.
+ * @param cost The total cost of the path.
+ * @param outputFile The output file stream.
+ */
+void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
     if (path.size() < 2 || cost < 0) {
         outputFile << "none\n";
         return;
@@ -32,6 +39,14 @@ void outputPathAndCost(list<int>& path, int cost, ostream& outputFile) {
     outputFile << "(" << cost << ")\n";
 }
 
+/**
+ * @brief Splits a driving and walking path into two separate lists.
+ * 
+ * @param path The full path including both driving and walking sections.
+ * @param parkingNodeId The node where the switch from driving to walking occurs.
+ * @param drivingPath The list to store the driving portion of the path.
+ * @param walkingPath The list to store the walking portion of the path.
+ */
 void parseDrivingWalkingPath(list<int>& path, int parkingNodeId, list<int>& drivingPath, list<int>& walkingPath) {
     bool driving = true;
     for (int node : path) {
@@ -49,6 +64,16 @@ void parseDrivingWalkingPath(list<int>& path, int parkingNodeId, list<int>& driv
     }
 }
 
+/**
+ * @brief Outputs the driving and walking portions of a path to a file.
+ * 
+ * @param path The full path including driving and walking sections.
+ * @param parkingNodeId The node where the switch from driving to walking occurs.
+ * @param outputFile The output file stream.
+ * @param drivingTime The time taken for the driving portion.
+ * @param walkingTime The time taken for the walking portion.
+ * @param mode The mode identifier for the output.
+ */
 void outputDrivingWalkingPath(list<int>& path, int parkingNodeId, ofstream& outputFile, int& drivingTime, int& walkingTime, string mode) {
     list<int> drivingPath = {};
     list<int> walkingPath = {};
@@ -65,6 +90,14 @@ void outputDrivingWalkingPath(list<int>& path, int parkingNodeId, ofstream& outp
     outputFile << "TotalTime" << mode << ":" << drivingTime + walkingTime << "\n";
 }
 
+/**
+ * @brief Processes a batch mode operation for route planning.
+ * 
+ * Reads input from "batchmode/input.txt", processes the data, and writes the output
+ * to "batchmode/output.txt". Supports different routing modes and constraints.
+ * 
+ * @param graph The graph representing the road network.
+ */
 void processBatchMode(Graph<int>& graph) {
     // INPUT //
     ifstream inputFile("batchmode/input.txt");
@@ -184,20 +217,14 @@ void processBatchMode(Graph<int>& graph) {
     outputFile << "Source:" << sourceId << "\n";
     outputFile << "Destination:" << destinationId << "\n";
 
-
-    // INDEPENDENT ROUTE PLANNING //
     if (mode == "driving" && avoidNodes.empty() && avoidEdges.empty() && includeNode == -1) {
 
         list<int> bestPath = {}, altPath = {};
         int bestTime = -1, altTime = -1;
 
-        // Find the Best Route
         IndependentRoutePlanning(graph, source, destination, bestPath, bestTime, altPath, altTime);
-
-        // Print Best Route
         outputFile << "BestDrivingRoute:";
         outputPathAndCost(bestPath, bestTime, outputFile);
-        // Print Alternative Route
         outputFile << "AlternativeDrivingRoute:";
         outputPathAndCost(altPath, altTime, outputFile);
 
