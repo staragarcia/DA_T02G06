@@ -18,7 +18,7 @@
 
 using namespace std;
 
-void outputPathAndCost(list<int>& path, int cost, ofstream& outputFile) {
+void outputPathAndCost(list<int>& path, int cost, ostream& outputFile) {
     if (path.size() < 2 || cost < 0) {
         outputFile << "none\n";
         return;
@@ -200,12 +200,16 @@ void processBatchMode(Graph<int>& graph) {
         // Print Alternative Route
         outputFile << "AlternativeDrivingRoute:";
         outputPathAndCost(altPath, altTime, outputFile);
+
+    // RESTRICTED ROUTE PLANNING
     } else if (mode == "driving") {
         list<int> bestPath = {};
         int bestTime = -1;
         int time = RestrictedRoutePlanning(graph, source, destination, avoidNodes, avoidEdges, graph.findVertexById(includeNode), bestPath);
         outputFile << "RestrictedDrivingRoute:";
         outputPathAndCost(bestPath, time, outputFile);
+
+    //ENVIRONMENTALLY-FRIENDLY ROUTE PLANNING
     } else if (mode == "driving-walking" && maxWalkTime != -1) {
         list<int> path = {};
         int parkingNodeId;

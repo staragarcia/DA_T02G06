@@ -1,15 +1,1 @@
-Source:8
-Destination:5
-DrivingRoute:none
-ParkingNode:none
-WalkingRoute:none
-TotalTime:
-Message:Could not find a path with maximum walking time constraint.
-DrivingRoute1:8,4,2,3(19)
-ParkingNode1:3
-WalkingRoute1:3,5(10)
-TotalTime1:29
-DrivingRoute2:8,4,6(21)
-ParkingNode2:6
-WalkingRoute2:6,5(10)
-TotalTime2:31
+Error: Invalid source. 

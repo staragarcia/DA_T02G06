@@ -1,41 +1,79 @@
 #include <iostream>
 #include "utils/Graph.h"
 #include "batchmode/BatchMode.cpp" // Include the BatchMode header
+#include <string>
 
 using namespace std;
 
 void displayMenu() {
     cout << "\n===== Route Planning Analysis Tool =====\n";
-    cout << "1. Find fastest route\n";
-    cout << "2. Find second-fastest route\n";
-    cout << "3. Plan restricted route\n";
-    cout << "4. Plan eco-friendly route\n";
-    cout << "5. Run batch mode\n"; // Add batch mode option
-    cout << "6. Exit\n";
+    cout << "1. Independent Route Planning\n";
+    cout << "2. Restricted Route Planning\n";
+    cout << "3. Environmentally-Friendly Route Planning (driving and walking)\n";
+    cout << "4. Run batch mode\n"; // Add batch mode option
+    cout << "5. Exit\n";
     cout << "Enter your option: ";
 }
 
-void shortestRoute() {
+void validateSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &destination) {
+    int sourceId;
+    int destinationId;
+
+    cout << "Enter the source node id: ";
+    cin >> sourceId;
+    while (!(source = g.findVertexById(sourceId))) {
+        cout << "Error: Invalid source. Try again: ";
+        cin >> sourceId;
+    }
+
+    cout << "Enter the destination node id: ";
+    cin >> destinationId;
+    while (!(destination = g.findVertexById(destinationId))) {
+        cout << "Error: Invalid destination. Try again: ";
+        cin >> destinationId;
+    }
+
+    cout << "\n";
+}
+
+void independentRoute(Graph<int> &g) {
     cout << "Finding shortest route...\n";
-    // Add logic for shortest route
+
+    Vertex<int>* source = nullptr;
+    Vertex<int>* destination = nullptr;
+
+    validateSourceAndDest(g, source, destination);
+
+    list<int> bestPath = {}, altPath = {};
+    int bestTime = -1, altTime = -1;
+
+    // Find the Best Route
+    IndependentRoutePlanning(g, source, destination, bestPath, bestTime, altPath, altTime);
+
+    // Print Best Route
+    cout << "BestDrivingRoute:";
+    outputPathAndCost(bestPath, bestTime, cout);
+    // Print Alternative Route
+    cout << "AlternativeDrivingRoute:";
+    outputPathAndCost(altPath, altTime, cout);
 }
 
-void secondShortestRoute() {
+void restrictedRoute(Graph<int> &g) {
     cout << "Finding second-shortest route...\n";
-    // Add logic for second-shortest route
+
+    Vertex<int>* source = nullptr;
+    Vertex<int>* destination = nullptr;
+
+    validateSourceAndDest(g, source, destination);
+    
 }
 
-void restrictedRoute() {
+void EFriendlyRoute(Graph<int> &g) {
     cout << "Planning route with restrictions...\n";
     // Add logic for restricted route
 }
 
-void ecoFriendlyRoute() {
-    cout << "Planning environmentally friendly route...\n";
-    // Add logic for eco-friendly route
-}
-
-void runBatchMode() {
+void runBatchMode(Graph<int> &g) {
     cout << "\n[ Running batch mode... ]\n";
     Graph<int> graph;
 
@@ -49,6 +87,12 @@ void runBatchMode() {
 
 int main() {
     int option;
+    Graph<int> graph;
+
+    // Initialize the graph
+    readParseLocations(graph);
+    readParseDistances(graph);
+
     while (true) {
         displayMenu();
         cin >> option;
@@ -61,12 +105,11 @@ int main() {
         }
 
         switch (option) {
-            case 1: shortestRoute(); break;
-            case 2: secondShortestRoute(); break;
-            case 3: restrictedRoute(); break;
-            case 4: ecoFriendlyRoute(); break;
-            case 5: runBatchMode(); break; // Call batch mode
-            case 6: cout << "Exiting...\n"; return 0;
+            case 1: independentRoute(graph); break;
+            case 2: restrictedRoute(graph); break;
+            case 3: EFriendlyRoute(graph); break;
+            case 4: runBatchMode(graph); break; // Call batch mode
+            case 5: cout << "Exiting...\n"; return 0;
             default: cout << "Invalid option! Please try again.\n";
         }
     }

@@ -7,6 +7,10 @@
 
 template <class T> 
 void IndependentRoutePlanning(Graph<T>& g, Vertex<T>* source, Vertex<T>* dest, std::list<T>& bestPath, int& bestTime, std::list<T>& altPath, int& altTime) {
+    if (source==nullptr || dest==nullptr) {
+        std::cout << "Source or destination can't be null!\n";
+        return;
+    }
     std::vector<Vertex<T>*> visitedVertices = {};
     std::unordered_set<int> usedNodes;
     bestTime = RestrictedDijkstra(g, source, dest, {}, {{}}, visitedVertices);
