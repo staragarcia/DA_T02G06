@@ -6,8 +6,9 @@
 
 using namespace std;
 
-/**#include <regex>
- * @brief Displays the main menu for the Route Planning Analysis Tool.
+/**
+ * @brief Displays the main menu for the Route Planning Analysis Tool. This function prints the available options for the user to interact with the tool.
+ *
  */
 void displayMenu() {
     cout << "\n=====| Route Planning Analysis Tool |=====\n";
@@ -19,6 +20,13 @@ void displayMenu() {
     cout << "Enter your option: ";
 }
 
+/**
+ * @brief Reads the source and destination vertices from user input. This function prompts the user to input the IDs of the source and destination vertices. It validates the input to ensure the vertices exist in the graph.
+ * 
+ * @param g Reference to the graph object.
+ * @param source Reference to a pointer where the source vertex will be stored.
+ * @param destination Reference to a pointer where the destination vertex will be stored.
+ */
 void readSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &destination) {
     int sourceId;
     int destinationId;
@@ -38,6 +46,11 @@ void readSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &desti
     }
 }
 
+/**
+ * @brief Executes the independent route planning functionality.
+ * 
+ * @param g Reference to the graph object.
+ */
 void independentRoute(Graph<int> &g) {
     cout << "Finding best and alternative routes...\n";
 
@@ -63,6 +76,11 @@ void independentRoute(Graph<int> &g) {
     outputPathAndCost(altPath, altTime, cout);
 }
 
+/**
+ * @brief Executes the restricted route planning functionality.
+ * 
+ * @param g Reference to the graph object.
+ */
 void restrictedRoute(Graph<int> &g) {
     cout << "Finding restricted route...\n";
 
@@ -128,6 +146,11 @@ void restrictedRoute(Graph<int> &g) {
     
 }
 
+/**
+ * @brief Executes the environmentally-friendly route planning functionality.
+ * 
+ * @param g Reference to the graph object.
+ */
 void EFriendlyRoute(Graph<int> &g) {
     cout << "Finding environmentally-friendly route...\n";
 
@@ -204,6 +227,11 @@ void EFriendlyRoute(Graph<int> &g) {
     }
 }
 
+/**
+ * @brief Executes the batch mode functionality.
+ * 
+ * @param g Reference to the graph object.
+ */
 void runBatchMode(Graph<int> &g) {
     cout << "\n[ Running batch mode... ]\n";
     Graph<int> graph;
@@ -216,7 +244,15 @@ void runBatchMode(Graph<int> &g) {
     processBatchMode(graph);
 }
 
-
+/**
+ * @brief Main function and entry point of the program.
+ * 
+ * This function initializes the graph, displays the main menu, and handles user input
+ * to execute the selected route planning functionality. The program runs in a loop until
+ * the user chooses to exit.
+ * 
+ * @return int Returns 0 upon successful execution.
+ */
 int main() {
     int option;
     Graph<int> graph;
