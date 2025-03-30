@@ -104,7 +104,7 @@ Vertex<T>* drivingDijkstra(const Graph<T>& g, Vertex<T>* source, const std::unor
       if (reacheableWalkingVertices.find(v) != reacheableWalkingVertices.end()) {
          numReacheableWalkingVertices--;
          auto it = reacheableWalkingVertices.find(v);
-         if (v != source && it->second + v->getDist() < parkingNodeCost) {
+         if (v != source && ((it->second + v->getDist() < parkingNodeCost) || (it->second + v->getDist() == parkingNodeCost && it->second > walkingTime))) {
             parkingNode = v;
             parkingNodeCost = it->second + v->getDist();
             walkingTime = it->second;
