@@ -21,6 +21,17 @@ void displayMenu() {
 }
 
 /**
+ * @brief Verifies if a string is fully numeric, for parsing purposes.
+ * 
+ * @param str 
+ * @return true 
+ * @return false 
+ */
+bool is_numeric(const std::string& str) {
+    return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+}
+
+/**
  * @brief Reads the source and destination vertices from user input. This function prompts the user to input the IDs of the source and destination vertices. It validates the input to ensure the vertices exist in the graph.
  * 
  * @param g Reference to the graph object.
@@ -28,21 +39,59 @@ void displayMenu() {
  * @param destination Reference to a pointer where the destination vertex will be stored.
  */
 void readSourceAndDest (Graph<int> &g, Vertex<int>* &source, Vertex<int>* &destination) {
-    int sourceId;
-    int destinationId;
+    std::string sourceIdString, destinationIdString;
+    int sourceId, destinationId;
 
-    cout << "Source:";
-    cin >> sourceId;
-    while (!(source = g.findVertexById(sourceId))) {
-        cout << "Error: Invalid source. Try again: ";
-        cin >> sourceId;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
+    while (true) {
+        std::cout << "Source:";
+        std::getline(std::cin, sourceIdString);
+
+        if (!is_numeric(sourceIdString)) {
+            std::cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
+
+        try {
+            sourceId = std::stoi(sourceIdString);  // Attempt conversion
+
+            if (!(source = g.findVertexById(sourceId))) {
+                std::cout << "Error: Invalid source. Try again.\n";
+                continue;
+            }
+
+            break;  // Valid input, exit loop
+
+        } catch (const std::out_of_range&) {   // Input is above the int limit
+            std::cout << "Number out of range! Please enter a smaller number.\n";
+            continue;
+        }
     }
 
-    cout << "Destination:";
-    cin >> destinationId;
-    while (!(destination = g.findVertexById(destinationId))) {
-        cout << "Error: Invalid destination. Try again: ";
-        cin >> destinationId;
+    while (true) {
+        std::cout << "Destination:";
+        std::getline(std::cin, destinationIdString);
+
+        if (!is_numeric(destinationIdString)) {
+            std::cout << "Invalid input! Please enter a number.\n";
+            continue;
+        }
+
+        try {
+            destinationId = std::stoi(destinationIdString);  
+
+            if (!(destination = g.findVertexById(destinationId))) {
+                std::cout << "Error: Invalid destination. Try again.\n";
+                continue;
+            }
+
+            break;  
+
+        } catch (const std::out_of_range&) {
+            std::cout << "Number out of range! Please enter a smaller number.\n";
+            continue;
+        }
     }
 }
 
@@ -88,7 +137,6 @@ void restrictedRoute(Graph<int> &g) {
     Vertex<int>* destination = nullptr;
 
     readSourceAndDest(g, source, destination);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     unordered_set<int> avoidNodes = {};
     std::string input;
@@ -158,8 +206,6 @@ void EFriendlyRoute(Graph<int> &g) {
     Vertex<int>* destination = nullptr;
 
     readSourceAndDest(g, source, destination);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
 
     int maxWalkTime;
     std::string input;
@@ -167,10 +213,8 @@ void EFriendlyRoute(Graph<int> &g) {
     cout << "MaxWalkTime:";
     std::getline(std::cin, input); 
     
-    while (input.empty()) {
-        cout << "Error: MaxWalkTime is obligatory. Try again:";
-    }
-    maxWalkTime = stoi(input);
+    if (input.empty()) maxWalkTime = std::numeric_limits<int>::max();
+    else maxWalkTime = stoi(input);
 
     unordered_set<int> avoidNodes = {};
 

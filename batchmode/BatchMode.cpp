@@ -200,6 +200,7 @@ void processBatchMode(Graph<int>& graph) {
             }
         } else if (key == "MaxWalkTime") {
             if (value == "") {
+                maxWalkTime = std::numeric_limits<int>::max();
                 continue;
             }
             try {
