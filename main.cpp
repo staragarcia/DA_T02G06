@@ -212,6 +212,7 @@ void EFriendlyRoute(Graph<int> &g) {
     int parkingNodeId;
     int walkingTime, drivingTime;
     cout << "\n========| OUTPUT |========\n";
+    outputSourceDest(source->getId(), destination->getId(), cout);
     int err = calculateEnvironmentallyFriendlyPath(g, source, destination, maxWalkTime, avoidNodes, avoidEdges, path, parkingNodeId, walkingTime, drivingTime);
     if (err != 0) {
         cout << "DrivingRoute:\nParkingNode:\nWalkingRoute:\nTotalTime:\nMessage:";

@@ -1,9 +1,6 @@
 Mode:driving-walking
 Source:8
-Destination:6
+Destination:5
 MaxWalkTime:5
-AvoidNodes:3
-AvoidSegments:    
-
-
-
+AvoidNodes:
+AvoidSegments:
